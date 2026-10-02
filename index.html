@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Libreta de notas del curso</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="pagina">
+    <header class="cabecera">
+      <h1>Libreta de notas</h1>
+      <p>Registra hasta 10 alumnos con sus tres certámenes. Se aprueba con promedio de 55 o más.</p>
+    </header>
+
+    <section class="tarjeta" aria-labelledby="t-form">
+      <div class="tarjeta-top">
+        <h2 id="t-form">Agregar alumno</h2>
+        <span class="contador" id="contador">0 de 10 alumnos</span>
+      </div>
+      <form id="formulario" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" autocomplete="off" placeholder="Ej: Carlos Pérez">
+          <small class="error" id="e-nombre"></small>
+        </div>
+        <div class="fila-notas">
+          <div class="campo"><label for="c1">Certamen 1</label><input id="c1" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="0 a 100"><small class="error" id="e-c1"></small></div>
+          <div class="campo"><label for="c2">Certamen 2</label><input id="c2" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="0 a 100"><small class="error" id="e-c2"></small></div>
+          <div class="campo"><label for="c3">Certamen 3</label><input id="c3" type="number" min="0" max="100" step="any" inputmode="decimal" placeholder="0 a 100"><small class="error" id="e-c3"></small></div>
+        </div>
+        <p class="mensaje" id="mensaje" role="status" aria-live="polite"></p>
+        <div class="acciones">
+          <button type="submit" class="btn btn-primario" id="btn-agregar">Agregar alumno</button>
+          <button type="button" class="btn btn-secundario" id="btn-reiniciar">Borrar todo</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="resultados" class="resultados" aria-live="polite" hidden>
+      <div class="tarjeta">
+        <h2>Notas por alumno</h2>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Alumno</th><th>C1</th><th>C2</th><th>C3</th><th>Promedio</th><th>Estado</th></tr></thead>
+            <tbody id="tabla-alumnos"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Resumen del curso</h2>
+        <div class="resumen" id="resumen"></div>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Ranking por promedio</h2>
+        <p class="nota">La marca vertical indica la nota de aprobación (55).</p>
+        <ol class="ranking" id="ranking"></ol>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/validacion.js"></script>
+  <script src="js/calculos.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
