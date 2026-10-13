@@ -1,77 +1,61 @@
-// Presentación: lectura del formulario y dibujo de resultados.
-const $ = (id) => document.getElementById(id);
-const fmt = (n) => n.toFixed(2);
-const claseEstado = (p) => (p >= NOTA_APROBACION ? "aprobado" : "reprobado");
-const textoEstado = (p) => (p >= NOTA_APROBACION ? "Aprobado" : "Reprobado");
+import { NOTA_APROBACION } from './calculos.js';
 
-function el(tag, clase, texto) {
-  const nodo = document.createElement(tag);
-  if (clase) nodo.className = clase;
-  if (texto !== undefined) nodo.textContent = texto;
-  return nodo;
-}
 
-function mostrarErrores(errores) {
-  Object.entries(errores).forEach(([campo, msg]) => {
-    $("e-" + campo).textContent = msg;
-    $(campo).classList.toggle("invalido", msg !== "");
-  });
-}
+export const $ = (id) => document.getElementById(id);
+export const fmt = (n) => n.toFixed(2);
+export const claseEstado = (p) => (p >= NOTA_APROBACION ? "aprobado" : "reprobado");
+export const textoEstado = (p) => (p >= NOTA_APROBACION ? "Aprobado" : "Reprobado");
 
-function mostrarMensaje(texto, tipo) {
-  const m = $("mensaje");
-  m.textContent = texto;
-  m.className = "mensaje " + (tipo || "");
-}
+export function mostrarResumen(nombres, notas, cantidad) {
+    const contenedor = $("resultado");
+    if (!contenedor) return;
 
-function actualizarContador(cantidad, max) {
-  $("contador").textContent = `${cantidad} de ${max} alumnos`;
-  const lleno = cantidad >= max;
-  $("btn-agregar").disabled = lleno;
-  if (lleno) mostrarMensaje("Curso completo: ya registraste los 10 alumnos.", "info");
-}
+    if (cantidad === 0) {
+        contenedor.innerHTML = "<p style='color: #5b6778; margin: 0;'>No hay alumnos registrados todavía.</p>";
+        return;
+    }
 
-function dibujarTabla(nombres, notas, promedios) {
-  const cuerpo = $("tabla-alumnos");
-  cuerpo.replaceChildren();
-  nombres.forEach((nombre, i) => {
-    const tr = el("tr");
-    tr.append(el("td", "nombre", nombre));
-    notas[i].forEach((n) => tr.append(el("td", "num", String(n))));
-    tr.append(el("td", "num fuerte", fmt(promedios[i])));
-    const td = el("td");
-    td.append(el("span", "chip " + claseEstado(promedios[i]), textoEstado(promedios[i])));
-    tr.append(td);
-    cuerpo.append(tr);
-  });
-}
+    let html = "";
+    let sumaC1 = 0, sumaC2 = 0, sumaC3 = 0;
+    let aprobados = 0;
+    let reprobados = 0;
 
-function dibujarResumen(porCertamen, general, aprobados, reprobados) {
-  const cont = $("resumen");
-  cont.replaceChildren();
-  const dato = (etiqueta, valor, extra) => {
-    const d = el("div", "dato " + (extra || ""));
-    d.append(el("span", "dato-valor", valor), el("span", "dato-etiqueta", etiqueta));
-    return d;
-  };
-  porCertamen.forEach((p, i) => cont.append(dato(`Promedio C${i + 1}`, fmt(p))));
-  cont.append(dato("Promedio final del curso", fmt(general), "destacado"));
-  cont.append(dato("Aprobados", String(aprobados), "ok"));
-  cont.append(dato("Reprobados", String(reprobados), "mal"));
-}
+    for (let i = 0; i < cantidad; i++) {
+        let c1 = notas[i][0];
+        let c2 = notas[i][1];
+        let c3 = notas[i][2];
+        
+        let promAlumno = (c1 + c2 + c3) / 3;
 
-function dibujarRanking(ordenados) {
-  const lista = $("ranking");
-  lista.replaceChildren();
-  ordenados.forEach(({ nombre, promedio }) => {
-    const li = el("li", "rank-item");
-    const top = el("div", "rank-top");
-    top.append(el("span", "rank-nombre", nombre), el("span", "rank-prom", fmt(promedio)));
-    const barra = el("div", "barra");
-    const relleno = el("div", "relleno " + claseEstado(promedio));
-    relleno.style.width = Math.min(promedio, 100) + "%";
-    barra.append(relleno, el("span", "marca"));
-    li.append(top, barra);
-    lista.append(li);
-  });
+        sumaC1 += c1;
+        sumaC2 += c2;
+        sumaC3 += c3;
+
+        if (promAlumno >= NOTA_APROBACION) {
+            aprobados++;
+        } else {
+            reprobados++;
+        }
+
+        html += `Nombre ${i + 1}: ${nombres[i]}<br>`;
+        html += `C1: ${c1}<br>`;
+        html += `C2: ${c2}<br>`;
+        html += `C3: ${c3}<br>`;
+        html += `Promedio: ${fmt(promAlumno)}<br>`;
+    }
+
+    let promCursoC1 = sumaC1 / cantidad;
+    let promCursoC2 = sumaC2 / cantidad;
+    let promCursoC3 = sumaC3 / cantidad;
+    let promFinalCurso = (promCursoC1 + promCursoC2 + promCursoC3) / 3;
+
+    html += `<br>`;
+    html += `Promedio del curso C1: ${fmt(promCursoC1)}<br>`;
+    html += `Promedio del curso C2: ${fmt(promCursoC2)}<br>`;
+    html += `Promedio del curso C3: ${fmt(promCursoC3)}<br>`;
+    html += `Promedio Final Curso: ${fmt(promFinalCurso)}<br>`;
+    html += `Aprobados: ${aprobados}<br>`;
+    html += `Reprobados: ${reprobados}<br>`;
+
+    contenedor.innerHTML = html;
 }
